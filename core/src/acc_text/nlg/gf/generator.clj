@@ -124,6 +124,12 @@
                             (recur mods (format "(mkListAP %s %s)" mod body)))))))
             concept)))
 
+(defn join-sequence-body [body _]
+  (let [items (map :value body)]
+    (cond
+      (= 1 (count body)) (first items)
+      (= 2 (count body)) (format "(mkCN %s (mkNP %s))" (first items) (second items)))))
+
 (defn parse-lin [functions]
   (map-indexed (fn [i {:keys [params ret body type]}]
                  (format "Function%02d %s= {%s = %s}"
@@ -133,6 +139,7 @@
                          (if (seq body)
                            (cond
                              (and (= "CN" (second ret)) (= :modifier type)) (join-modifier-body body ret)
+                             (and (= "CN" (second ret)) (= :sequence type)) (join-sequence-body body ret)
                              :else (join-function-body body ret))
                            "\"\"")))
                functions))

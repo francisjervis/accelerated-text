@@ -1,0 +1,15 @@
+{:type     "Document-plan"
+ :segments [{:children [{:roles     [{:children [{:type "Quote" :srcId "Tn|7Lg{iK/P;LI0.7em" :text "car"}]
+                                      :name     "Subject"}
+                                     {:children [{:children [{:type "Quote" :srcId "@-;CiAi!wyv(poK=N@An" :text "engine"}
+                                                             {:type "Quote" :srcId "jai|tU}SmyyoZAShD;jA" :text "wheel"}
+                                                             {:type "Quote" :srcId "PW24aRQXqUbVq5ev(Rmq" :text "seat"}]
+                                                  :type     "Sequence"
+                                                  :srcId    "EUG?RP:^LS}WdmB=[o+q"}]
+                                      :name     "Object"}]
+                         :type      "AMR"
+                         :srcId     "Fjw73G0v9=PO]Y1?_*pA"
+                         :conceptId "has-a"}]
+             :type     "Segment"
+             :srcId    "G2dJ=T!.M5F}a0P6Al@:"}]
+ :srcId    "GH/B?hjMZ@LJx?[#J)0F"}

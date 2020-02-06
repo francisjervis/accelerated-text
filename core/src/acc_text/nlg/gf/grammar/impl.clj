@@ -63,14 +63,15 @@
 
 (defmulti build-function (fn [concept _ _ _] (:type concept)))
 
-(defmethod build-function :default [concept children _ _]
-  {:name   (concept->name concept)
-   :type   (:type concept)
-   :params (get-params children)
-   :body   (for [child-concept children]
-             {:kind  (get-kind child-concept)
-              :value (concept->name child-concept)})
-   :ret    [:s "Str"]})
+(defmethod build-function :default [concept children _ {types :types}]
+  (let [name (concept->name concept)]
+    {:name   name
+     :type   (:type concept)
+     :params (get-params children)
+     :body   (for [child-concept children]
+               {:kind  (get-kind child-concept)
+                :value (concept->name child-concept)})
+     :ret    [:s (get types name "Str")]}))
 
 (defmethod build-function :modifier [concept children relations {types :types}]
   (let [name (concept->name concept)
@@ -87,12 +88,13 @@
                                                      :value (concept->name child-concept)}]))
      :ret    [:s (get types name "Str")]}))
 
-(defmethod build-function :amr [{value :value :as concept} children relations {amr :amr}]
-  (let [role-map (reduce (fn [m [{{attr-name :name} :attributes} concept]]
+(defmethod build-function :amr [{value :value :as concept} children relations {:keys [amr types]}]
+  (let [name (concept->name concept)
+        role-map (reduce (fn [m [{{attr-name :name} :attributes} concept]]
                            (cond-> m (some? attr-name) (assoc attr-name concept)))
                          {}
                          (zipmap relations children))]
-    {:name   (concept->name concept)
+    {:name   name
      :type   :amr
      :params (get-params children)
      :body   (for [syntax (->> (get amr value) (:frames) (map :syntax))]
@@ -119,55 +121,68 @@
                                 :value "{{...}}"})
                        (attach-selectors attrs)
                        (cond-> (when (some? pos)) (assoc :pos pos))))))
-     :ret    [:s "Str"]}))
+     :ret    [:s (get types name "Str")]}))
 
-(defmethod build-function :shuffle [concept children _ _]
-  {:name   (concept->name concept)
-   :type   :shuffle
-   :params (get-params children)
-   :body   (for [permutation (filter seq (permutations children))]
-             (for [child-concept permutation]
-               {:kind  (get-kind child-concept)
-                :value (concept->name child-concept)}))
-   :ret    [:s "Str"]})
+(defmethod build-function :shuffle [concept children _ {types :types}]
+  (let [name (concept->name concept)]
+    {:name   name
+     :type   :shuffle
+     :params (get-params children)
+     :body   (for [permutation (filter seq (permutations children))]
+               (for [child-concept permutation]
+                 {:kind  (get-kind child-concept)
+                  :value (concept->name child-concept)}))
+     :ret    [:s (get types name "Str")]}))
 
-(defmethod build-function :synonyms [concept children _ _]
-  {:name   (concept->name concept)
-   :type   :synonyms
-   :params (get-params children)
-   :body   (for [child-concept children]
-             [{:kind  (get-kind child-concept)
-               :value (concept->name child-concept)}])
-   :ret    [:s "Str"]})
+(defmethod build-function :synonyms [concept children _ {types :types}]
+  (let [name (concept->name concept)]
+    {:name   name
+     :type   :synonyms
+     :params (get-params children)
+     :body   (for [child-concept children]
+               [{:kind  (get-kind child-concept)
+                 :value (concept->name child-concept)}])
+     :ret    [:s (get types name "Str")]}))
 
-(defmethod build-function :reference [concept children _ _]
-  {:name   (concept->name concept)
-   :type   :reference
-   :params (get-params children)
-   :body   (for [child-concept children]
-             [{:kind  (get-kind child-concept)
-               :value (concept->name child-concept)}])
-   :ret    [:s "Str"]})
+(defmethod build-function :reference [concept children _ {types :types}]
+  (let [name (concept->name concept)]
+    {:name   name
+     :type   :reference
+     :params (get-params children)
+     :body   (for [child-concept children]
+               [{:kind  (get-kind child-concept)
+                 :value (concept->name child-concept)}])
+     :ret    [:s (get types name "Str")]}))
+
+(defn get-modifier-types [parent-type children relations]
+  (let [child-concept (get-child-with-role children relations :child)
+        modifier-concepts (remove #(= (:id child-concept) (:id %)) children)]
+    (case parent-type
+      "CN" (-> (map concept->name modifier-concepts)
+               (zipmap (repeat "A"))
+               (assoc (concept->name child-concept) "N"))
+      (log/errorf "Type inference not implemented for concept type `%s` with parent type `%s`"
+                  (name type) parent-type))))
+
+(defn get-list-types [parent-type children]
+  (zipmap
+    (->> children
+         (filter #(contains? data-types (:type %)))
+         (map concept->name))
+    (repeat parent-type)))
 
 (defn add-child-types [parent-types child-concepts concept-map relation-map]
   (->> child-concepts
        (remove #(contains? data-types (:type %)))
        (map (fn [{:keys [id type] :as concept}]
               (let [concept-name (concept->name concept)
+                    parent-type (get parent-types concept-name)
                     relations (get relation-map id)
                     children (map (comp concept-map :to) relations)]
-                (case type
-                  :modifier (let [parent-type (get parent-types concept-name)
-                                  child-concept (get-child-with-role children relations :child)
-                                  modifier-concepts (remove #(= (:id child-concept) (:id %)) children)]
-                              (case parent-type
-                                "CN" (-> (map concept->name modifier-concepts)
-                                         (zipmap (repeat "A"))
-                                         (assoc (concept->name child-concept) "N"))
-                                (log/errorf "Type inference not implemented for concept type `%s` with parent type `%s`"
-                                            (name type) parent-type)))
-                  (log/errorf "Type inference not implemented for concept type `%s`"
-                              (name type))))))
+                (cond
+                  (= :modifier type) (get-modifier-types parent-type children relations)
+                  (contains? #{:shuffle :sequence :synonyms} type) (get-list-types parent-type children)
+                  :else (log/errorf "Type inference not implemented for concept type `%s`" (name type))))))
        (apply merge parent-types)))
 
 (defn find-types [concept-map relation-map {amr :amr}]

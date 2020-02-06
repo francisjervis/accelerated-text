@@ -352,4 +352,58 @@
                                                         :value  "madeOf"
                                                         :params [{:type "CN" :role "Subject"}
                                                                  {:type "CN" :role "Object"}]
-                                                        :type   :oper}]}]}}}))))
+                                                        :type   :oper}]}]}}})))
+  (is (= #::grammar{:flags     {:startcat "DocumentPlan01"}
+                    :functions [{:body   [{:kind  :function
+                                           :value "Segment02"}]
+                                 :name   "DocumentPlan01"
+                                 :params ["Segment02"]
+                                 :ret    [:s "Str"]
+                                 :type   :document-plan}
+                                {:body   [{:kind  :function
+                                           :value "Amr03"}]
+                                 :name   "Segment02"
+                                 :params ["Amr03"]
+                                 :ret    [:s "Str"]
+                                 :type   :segment}
+                                {:body   [[{:kind   :operation
+                                            :params [{:kind  :variable
+                                                      :value "Quote04"}
+                                                     {:kind  :function
+                                                      :value "Sequence05"}]
+                                            :value  "hasA_S"}]]
+                                 :name   "Amr03"
+                                 :params ["Sequence05"]
+                                 :ret    [:s "Str"]
+                                 :type   :amr}
+                                {:body   [{:kind  :variable
+                                           :value "Quote06"}
+                                          {:kind  :variable
+                                           :value "Quote07"}
+                                          {:kind  :variable
+                                           :value "Quote08"}]
+                                 :name   "Sequence05"
+                                 :params []
+                                 :ret    [:s "CN"]
+                                 :type   :sequence}]
+                    :instance  "Instance"
+                    :module    "Default"
+                    :variables [{:name  "Quote04"
+                                 :type  "CN"
+                                 :value ["car"]}
+                                {:name  "Quote06"
+                                 :type  "CN"
+                                 :value ["engine"]}
+                                {:name  "Quote07"
+                                 :type  "CN"
+                                 :value ["wheel"]}
+                                {:name  "Quote08"
+                                 :type  "CN"
+                                 :value ["seat"]}]}
+         (build-grammar
+           "gf-amr-sequence"
+           {:amr {"has-a" {:frames [{:syntax [{:ret    "S"
+                                               :value  "hasA_S"
+                                               :params [{:type "CN" :role "Subject"}
+                                                        {:type "CN" :role "Object"}]
+                                               :type   :oper}]}]}}}))))

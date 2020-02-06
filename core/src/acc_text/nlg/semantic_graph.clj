@@ -13,7 +13,7 @@
   (s/keys :opt-un [:acc-text.nlg.semantic-graph.relation.attributes/name]))
 
 (s/def :acc-text.nlg.semantic-graph.concept/type
-  #{:document-plan :segment :data :quote :dictionary-item :amr :shuffle :sequence :condition :if-statement
+  #{:document-plan :segment :data :quote :dictionary-item :amr :shuffle :sequence :synonyms :condition :if-statement
     :default-statement :comparator :boolean :variable :reference :modifier})
 
 (s/def ::concepts
