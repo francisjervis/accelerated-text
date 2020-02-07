@@ -18,7 +18,7 @@
   (map #(json/read-value % read-mapper) results))
 
 (defstate conn
-  :start (utils/get-conn conf))
+          :start (utils/get-conn conf))
 
 (defmulti transact-item (fn [resource-type _ _] resource-type))
 
@@ -59,10 +59,11 @@
 
 (defn prepare-amr-syntax-params [params]
   (->> params
-       (map (fn [{:keys [type role]}]
+       (map (fn [{:keys [type role det]}]
               (remove-nil-vals
                 {:param/type type
-                 :param/role role})))
+                 :param/role role
+                 :param/det  det})))
        (remove empty?)))
 
 (defn prepare-amr-syntax [syntax]
@@ -178,7 +179,8 @@
                                          :params (seq (map (fn [param]
                                                              (remove-nil-vals
                                                                {:type (:param/type param)
-                                                                :role (:param/role param)}))
+                                                                :role (:param/role param)
+                                                                :det  (:param/det param)}))
                                                            (:syntax/params syntax)))
                                          :pos    (:syntax/pos syntax)
                                          :type   (:syntax/type syntax)}))

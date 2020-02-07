@@ -36,7 +36,7 @@
                                  (reduce-kv (fn [m k v]
                                               (assoc m k (cond->> v
                                                                   (contains? #{:pos :type} k) (keyword)
-                                                                  (= :params k) (map #(select-keys % [:role :type])))))
+                                                                  (= :params k) (map #(select-keys % [:role :type :det])))))
                                             {}
                                             (into {} instance)))})
                   frames)}))

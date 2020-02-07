@@ -69,7 +69,12 @@
           {:db/ident       :param/role
            :db/valueType   :db.type/string
            :db/cardinality :db.cardinality/one
-           :db/doc         "Name of AMR role"}]
+           :db/doc         "Name of AMR role"}
+
+          {:db/ident       :param/det
+           :db/valueType   :db.type/string
+           :db/cardinality :db.cardinality/one
+           :db/doc         "Determiner of AMR operation"}]
 
          [{:db/ident       :syntax/role
            :db/valueType   :db.type/string
