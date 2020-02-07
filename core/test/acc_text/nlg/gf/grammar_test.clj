@@ -384,26 +384,26 @@
                                            :value "Quote08"}]
                                  :name   "Sequence05"
                                  :params []
-                                 :ret    [:s "CN"]
+                                 :ret    [:s "NP"]
                                  :type   :sequence}]
                     :instance  "Instance"
                     :module    "Default"
                     :variables [{:name  "Quote04"
-                                 :type  "CN"
+                                 :type  "NP"
                                  :value ["car"]}
                                 {:name  "Quote06"
-                                 :type  "CN"
+                                 :type  "NP"
                                  :value ["engine"]}
                                 {:name  "Quote07"
-                                 :type  "CN"
+                                 :type  "NP"
                                  :value ["wheel"]}
                                 {:name  "Quote08"
-                                 :type  "CN"
+                                 :type  "NP"
                                  :value ["seat"]}]}
          (build-grammar
            "gf-amr-sequence"
            {:amr {"has-a" {:frames [{:syntax [{:ret    "S"
                                                :value  "hasA_S"
-                                               :params [{:type "CN" :role "Subject"}
-                                                        {:type "CN" :role "Object"}]
+                                               :params [{:type "NP" :role "Subject" :det "a_Det"}
+                                                        {:type "NP" :role "Object" :det "a_Det"}]
                                                :type   :oper}]}]}}}))))

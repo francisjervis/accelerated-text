@@ -9,6 +9,8 @@ frames:
         ret: S
         params:
           - role: Subject
-            type: CN
+            type: NP
+            det: a_Det
           - role: Object
-            type: CN
+            type: NP
+            det: a_Det

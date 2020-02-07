@@ -10,8 +10,8 @@ frames:
         ret: S
         params:
           - role: Subject
-            type: CN
+            type: NP
           - role: Verb
             type: V2
           - role: Object
-            type: CN
+            type: NP

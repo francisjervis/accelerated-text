@@ -10,7 +10,7 @@ frames:
         ret: S
         params:
           - role: Object
-            type: CN
+            type: NP
           - role: Property
             type: A
           - role: Polarity
