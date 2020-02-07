@@ -40,6 +40,7 @@
                        "positivePol"
                        "negativePol")
                "CN" (format "(mkCN (mkN \"%s\"))" (escape-string %))
+               "NP" (format "(mkNP (mkN \"%s\"))" (escape-string %))
                (format "(mk%s \"%s\")" type (escape-string %))))
        (str/join " | ")))
 
@@ -110,7 +111,7 @@
         modifiers (->> (subvec (vec body) 0 (dec (count body)))
                        (map :value)
                        (map #(format "(mkAP %s)" %)))]
-    (format "(mkCN %s %s)"
+    (format "(mkNP (mkCN %s %s))"
             (cond
               (= 1 (count modifiers)) (first modifiers)
               (= 2 (count modifiers)) (format "(mkAP and_Conj (mkListAP %s %s))" (first modifiers) (second modifiers))
@@ -128,7 +129,15 @@
   (let [items (map :value body)]
     (cond
       (= 1 (count body)) (first items)
-      (= 2 (count body)) (format "(mkCN %s (mkNP %s))" (first items) (second items)))))
+      (= 2 (count body)) (format "(mkNP and_Conj (mkListNP %s %s))" (first items) (second items))
+      :else (format
+              "(mkNP and_Conj %s)"
+              (let [items (reverse items)]
+                (loop [[item & mods] (drop 2 items)
+                       body (format "(mkListNP %s %s)" (second items) (first items))]
+                  (if-not (some? item)
+                    body
+                    (recur mods (format "(mkListNP %s %s)" item body)))))))))
 
 (defn parse-lin [functions]
   (map-indexed (fn [i {:keys [params ret body type]}]
@@ -138,8 +147,8 @@
                          (name (nth ret 0))
                          (if (seq body)
                            (cond
-                             (and (= "CN" (second ret)) (= :modifier type)) (join-modifier-body body ret)
-                             (and (= "CN" (second ret)) (= :sequence type)) (join-sequence-body body ret)
+                             (and (= "NP" (second ret)) (= :modifier type)) (join-modifier-body body ret)
+                             (and (= "NP" (second ret)) (= :sequence type)) (join-sequence-body body ret)
                              :else (join-function-body body ret))
                            "\"\"")))
                functions))
