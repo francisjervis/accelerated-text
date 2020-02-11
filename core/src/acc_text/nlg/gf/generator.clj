@@ -97,13 +97,25 @@
       "|"
       "++")))
 
+
+(defn is-amr? [arg]
+  (and (= :function (:kind arg)) (str/starts-with? (:value arg) "Amr")))
+
+(defn joining-amrs? [args] (every? is-amr? args))
+
+(defn join-amrs [args ret]
+  (format "mkText(%s).s" (str/join " " (map (fn [arg] (format "mkText(%s)" (:value arg))) args))))
+
 (defn join-function-body [body ret]
-  (str/join " " (map (fn [expr next-expr]
-                       (let [operator (get-operator expr next-expr)]
-                         (cond-> (join-expression expr ret)
-                                 (some? operator) (str " " operator))))
-                     body
-                     (concat (rest body) [nil]))))
+  (log/spyf :trace "join-function-body result %s"
+            (if (joining-amrs? body)
+              (join-amrs body ret)
+              (str/join " " (map (fn [expr next-expr]
+                                   (let [operator (get-operator expr next-expr)]
+                                     (cond-> (join-expression expr ret)
+                                       (some? operator) (str " " operator))))
+                                 body
+                                 (concat (rest body) [nil]))))))
 
 (defn join-modifier-body [body _]
   (let [concept (:value (last body))

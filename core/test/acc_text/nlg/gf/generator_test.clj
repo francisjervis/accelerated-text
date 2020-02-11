@@ -53,3 +53,24 @@
                                                                         {:role "polarity" :type "Pol"}]}]}]}}
                                    :data {:name           "KFC"
                                           :familyFriendly "false"}})))))
+
+
+(deftest ^:integration join-amrs
+  (is (= ["Lucy is a cat. Lucy has a ball."]
+         (generate (grammar/build "JoinAmrs" "Example" (utils/load-test-semantic-graph "two-amrs")
+                                  {:amr  {"has-a"
+                                          {:frames [{:syntax [{:type   :oper
+                                                               :value  "hasA_S"
+                                                               :ret    "S"
+                                                               :params [{:role "subject" :type "CN"}
+                                                                        {:role "object" :type "CN"}]}]}]}
+
+                                          "is-a"
+                                          {:frames [{:syntax [{:type   :oper
+                                                               :value  "isA_S"
+                                                               :ret    "S"
+                                                               :params [{:role "subject"   :type "CN"}
+                                                                        {:role "attribute" :type "CN"}]}]}]}}
+                                   :data {:name           "Lucy"
+                                          :toy            "ball"
+                                          :specy          "cat"}})))))
