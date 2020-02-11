@@ -32,7 +32,7 @@ def compile_grammar(name, content):
                 f.write(v)
         
         logger.info("Compiling")
-        cmd = "gf -i /opt/gf/lang-utils/ -i /opt/gf/concept-net/ --output-dir={path} -make {files} {main}".format(
+        cmd = "gf -i /opt/gf/lang-utils/ -i /opt/gf/concept-net/ -i /opt/gf/dictionary/ --output-dir={path} -make {files} {main}".format(
                 path=tmpdir,
                 main="{0}/{1}.gf".format(tmpdir, name),
                 files=" ".join(files)

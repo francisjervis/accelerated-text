@@ -53,13 +53,16 @@
 
 (defmethod build-variable :dictionary-item [{value :value {item-name :name} :attributes :as concept} {:keys [types dictionary]}]
   (let [name (concept->name concept)
+        pos (second (re-find #"^.+_(.+)$" value))
         dict-entry (get dictionary value)]
     {:name  name
-     :value (-> dict-entry
-                (cond->> (empty? dict-entry) (cons (or item-name value)))
-                (distinct)
-                (into []))
-     :type  (get types name "Str")}))
+     :value (if (some? pos)
+              (vector value)
+              (-> dict-entry
+                  (cond->> (empty? dict-entry) (cons (or item-name value)))
+                  (distinct)
+                  (into [])))
+     :type  (or pos (get types name "Str"))}))
 
 (defmulti build-function (fn [concept _ _ _] (:type concept)))
 

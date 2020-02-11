@@ -286,6 +286,11 @@
            :db/cardinality :db.cardinality/one
            :db/doc         "Dictionary item related to the concept"}
 
+          {:db/ident       :blockly/partOfSpeech
+           :db/valueType   :db.type/string
+           :db/cardinality :db.cardinality/one
+           :db/doc         "Part of speech of Dictionary Item"}
+
           {:db/ident       :blockly/operator
            :db/valueType   :db.type/string
            :db/cardinality :db.cardinality/one

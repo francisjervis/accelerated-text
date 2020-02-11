@@ -352,4 +352,25 @@
                                                         :value  "madeOf"
                                                         :params [{:type "CN" :role "Subject"}
                                                                  {:type "CN" :role "Object"}]
-                                                        :type   :oper}]}]}}}))))
+                                                        :type   :oper}]}]}}})))
+  (is (= #:acc-text.nlg.gf.grammar{:flags     {:startcat "DocumentPlan01"}
+                                   :functions [{:body   [{:kind  :function
+                                                          :value "Segment02"}]
+                                                :name   "DocumentPlan01"
+                                                :params ["Segment02"]
+                                                :ret    [:s "Str"]
+                                                :type   :document-plan}
+                                               {:body   [{:kind  :variable
+                                                          :value "DictionaryItem03"}]
+                                                :name   "Segment02"
+                                                :params []
+                                                :ret    [:s "Str"]
+                                                :type   :segment}]
+                                   :instance  "Instance"
+                                   :module    "Default"
+                                   :variables [{:name  "DictionaryItem03"
+                                                :type  "N"
+                                                :value ["kitchen_N"]}]}
+         (build-grammar
+           "dictionary-item"
+           {:dictionary {"kitchen_N" ["kitchen"]}}))))

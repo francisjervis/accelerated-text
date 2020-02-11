@@ -19,8 +19,10 @@ ADD core/gf/test.py test.py
 ADD core/test/resources/gf/ test_grammars/
 ADD core/gf/lang-utils /opt/gf/lang-utils
 ADD core/gf/concept-net /opt/gf/concept-net
+ADD core/gf/dictionary /opt/gf/dictionary
 
 RUN gf -make /opt/gf/lang-utils/*.gf
 RUN gf -make /opt/gf/concept-net/*.gf
+RUN gf -make /opt/gf/dictionary/*.gf
 
 CMD ["pytest", "test.py"]

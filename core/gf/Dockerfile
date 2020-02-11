@@ -15,7 +15,9 @@ RUN dpkg -i gf_3.10-2_amd64.deb && rm -rf gf_3.10-2_amd64.deb
 ADD core/gf/server.py server.py
 ADD core/gf/lang-utils /opt/gf/lang-utils
 ADD core/gf/concept-net /opt/gf/concept-net
+ADD core/gf/dictionary /opt/gf/dictionary
 RUN gf -make /opt/gf/lang-utils/*.gf
 RUN gf -make /opt/gf/concept-net/*.gf
+RUN gf -make /opt/gf/dictionary/*.gf
 
 CMD ["gunicorn", "-b 0.0.0.0:8000", "server"]

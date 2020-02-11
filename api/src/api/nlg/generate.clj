@@ -43,9 +43,7 @@
          ref-expr-fn (partial ref-expr/apply-ref-expressions :en)
          enrich-data (into {} (map (fn [[k v]] {v (format "{%s}" (name k))}) data))
          enrich-fn (fn [text]
-                     (cond-> {:original (ref-expr-fn text)}
-                       enrich (assoc :enriched (ref-expr-fn
-                                                (nlg/enrich-text enrich-data text)))))]
+                     (cond-> {:original (ref-expr-fn text)}))]
      (->> (nlg/generate-text semantic-graph (assoc context :data  data))
           (map :text)
           (sort)

@@ -34,13 +34,15 @@
 
 (defn join-value [type value]
   (->> value
-       (map #(case type
-               "Str" (format "\"%s\"" (escape-string %))
-               "Pol" (if (Boolean/valueOf ^String %)
-                       "positivePol"
-                       "negativePol")
-               "CN" (format "(mkCN (mkN \"%s\"))" (escape-string %))
-               (format "(mk%s \"%s\")" type (escape-string %))))
+       (map #(if (str/includes? % (str "_" type))
+               %
+               (case type
+                 "Str" (format "\"%s\"" (escape-string %))
+                 "Pol" (if (Boolean/valueOf ^String %)
+                         "positivePol"
+                         "negativePol")
+                 "CN" (format "(mkCN (mkN \"%s\"))" (escape-string %))
+                 (format "(mk%s \"%s\")" type (escape-string %)))))
        (str/join " | ")))
 
 (defn parse-oper [variables]
@@ -77,7 +79,7 @@
              (< 1 (count expr)) (format "(%s)"))
     (let [{:keys [kind value params]} expr]
       (case kind
-        :variable value
+        :variable (cond-> value (= "Str" (second ret)) (str ".s"))
         :literal (cond->> (format "\"%s\"" (escape-string value))
                           (not= "Str" (second ret)) (format "(mk%s %s)" (second ret)))
         :function (format "%s.s" value)
@@ -148,7 +150,7 @@
 (def imports ["LangFunctionsEng" "SyntaxEng" "ParadigmsEng"
               "AtLocationEng" "CapableOfEng" "HasAEng"
               "HasPropertyEng" "IsAEng" "LocatedNearEng"
-              "MadeOfEng" "HasAEng"])
+              "MadeOfEng" "HasAEng", "BasicDictionaryEng"])
 
 (defn ->incomplete [{::grammar/keys [module functions]}]
   (format "incomplete concrete %sBody of %s = open %sLex, %s in {%s\n}"
@@ -168,7 +170,7 @@
             "oper" (parse-oper (map #(dissoc % :value) variables)))))
 
 (defn ->resource [{::grammar/keys [instance module variables]}]
-  (format "resource %sLex%s = open SyntaxEng, ParadigmsEng in {%s\n}"
+  (format "resource %sLex%s = open SyntaxEng, ParadigmsEng, BasicDictionaryEng in {%s\n}"
           module
           instance
           (join-body
